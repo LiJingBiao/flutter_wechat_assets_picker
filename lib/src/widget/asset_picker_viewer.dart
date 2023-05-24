@@ -41,6 +41,7 @@ class AssetPickerViewer<Asset, Path> extends StatefulWidget {
     int? maxAssets,
     bool shouldReversePreview = false,
     AssetSelectPredicate<AssetEntity>? selectPredicate,
+    void Function()? deleteVideoAction,
   }) async {
     await AssetPicker.permissionCheck();
     final Widget viewer = AssetPickerViewer<AssetEntity, AssetPathEntity>(
@@ -63,6 +64,7 @@ class AssetPickerViewer<Asset, Path> extends StatefulWidget {
         maxAssets: maxAssets,
         shouldReversePreview: shouldReversePreview,
         selectPredicate: selectPredicate,
+        deleteVideoAction: deleteVideoAction,
       ),
     );
     final PageRouteBuilder<List<AssetEntity>> pageRoute =
