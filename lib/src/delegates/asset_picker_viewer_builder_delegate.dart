@@ -793,7 +793,8 @@ class DefaultAssetPickerViewerBuilderDelegate
                 ),
               )
             else if (!isAppleOS)
-              const Spacer(),
+              _buildDeleteButton(context),
+            // const Spacer(),
           ],
         ),
       ),
