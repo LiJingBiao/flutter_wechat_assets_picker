@@ -521,6 +521,7 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
       color: theme.primaryColor.withOpacity(isAppleOS ? 0.90 : 1),
       child: Row(
         children: <Widget>[
+          if (isAppleOS) previewButton(context),
           if (!isAppleOS) previewButton(context),
           if (isAppleOS) const Spacer(),
           if (isAppleOS) confirmButton(context),
