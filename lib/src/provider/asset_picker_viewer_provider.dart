@@ -61,6 +61,23 @@ class AssetPickerViewerProvider<A> extends ChangeNotifier {
     currentlySelectedAssets = newList;
   }
 
+  //by lijingbiao 裁剪过的替换
+  void replaceAsset(A oldItem, A newItem) {
+    if (currentlySelectedAssets.contains(oldItem)) {
+      int index = currentlySelectedAssets.indexOf(oldItem);
+      currentlySelectedAssets[index] = newItem;
+      notifyListeners();
+    } else {
+      if (currentlySelectedAssets.length == maxAssets) {
+        return;
+      } else {
+        final List<A> newList = _currentlySelectedAssets.toList()..add(newItem);
+        currentlySelectedAssets = newList;
+        notifyListeners();
+      }
+    }
+  }
+
   @Deprecated('Use selectAsset instead')
   void selectAssetEntity(A entity) => selectAsset(entity);
 

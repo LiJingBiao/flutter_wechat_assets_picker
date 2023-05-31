@@ -3,6 +3,7 @@
 // in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -42,6 +43,7 @@ class AssetPickerViewer<Asset, Path> extends StatefulWidget {
     bool shouldReversePreview = false,
     AssetSelectPredicate<AssetEntity>? selectPredicate,
     void Function()? deleteVideoAction,
+    Route<dynamic> Function(File file, int type)? editRoute,
   }) async {
     await AssetPicker.permissionCheck();
     final Widget viewer = AssetPickerViewer<AssetEntity, AssetPathEntity>(
@@ -65,6 +67,7 @@ class AssetPickerViewer<Asset, Path> extends StatefulWidget {
         shouldReversePreview: shouldReversePreview,
         selectPredicate: selectPredicate,
         deleteVideoAction: deleteVideoAction,
+        editRoute: editRoute,
       ),
     );
     final PageRouteBuilder<List<AssetEntity>> pageRoute =

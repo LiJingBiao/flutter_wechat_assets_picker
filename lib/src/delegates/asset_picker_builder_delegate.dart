@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-import 'dart:io' show Platform;
+import 'dart:io' show File, Platform;
 import 'dart:math' as math;
 import 'dart:typed_data' as typed_data;
 import 'dart:ui' as ui;
@@ -521,8 +521,9 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
       color: theme.primaryColor.withOpacity(isAppleOS ? 0.90 : 1),
       child: Row(
         children: <Widget>[
-          if (isAppleOS) previewButton(context),
-          if (!isAppleOS) previewButton(context),
+          previewButton(context),
+          // if (isAppleOS) previewButton(context),
+          // if (!isAppleOS) previewButton(context),
           if (isAppleOS) const Spacer(),
           if (isAppleOS) confirmButton(context),
         ],
@@ -674,6 +675,7 @@ class DefaultAssetPickerBuilderDelegate
     this.previewThumbnailSize,
     this.specialPickerType,
     this.keepScrollOffset = false,
+    this.editRoute,
   }) {
     // Add the listener if [keepScrollOffset] is true.
     if (keepScrollOffset) {
@@ -684,6 +686,9 @@ class DefaultAssetPickerBuilderDelegate
   /// [ChangeNotifier] for asset picker.
   /// 资源选择器状态保持
   final DefaultAssetPickerProvider provider;
+
+  //是否可以编辑照片
+  final Route<dynamic> Function(File file, int type)? editRoute;
 
   /// Thumbnail size in the grid.
   /// 预览时网络的缩略图大小
@@ -1939,6 +1944,7 @@ class DefaultAssetPickerBuilderDelegate
         selectorProvider: provider,
         themeData: theme,
         maxAssets: p.maxAssets,
+        editRoute: editRoute,
       );
       if (result != null) {
         Navigator.of(context).maybePop(result);

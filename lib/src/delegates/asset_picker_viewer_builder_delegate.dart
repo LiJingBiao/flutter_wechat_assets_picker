@@ -276,6 +276,30 @@ abstract class AssetPickerViewerBuilderDelegate<Asset, Path> {
     selectedNotifier.value = selectedCount;
   }
 
+  //编辑完替换asset
+  void replaceAsset(Asset oldItem, Asset newItem) {
+    provider?.replaceAsset(oldItem, newItem);
+    selectorProvider?.replaceAsset(oldItem, newItem);
+    previewAssets[currentIndex] = newItem;
+    selectedAssets?[currentIndex] = newItem;
+    //!isSelectedPreviewing
+    // if (true) {
+    //   if (selectedAssets != null && selectedAssets!.contains(oldItem)) {
+    //     int index = selectedAssets!.indexOf(oldItem);
+    //     selectedAssets![index] = newItem;
+    //   } else {
+    //     selectedAssets?.add(newItem);
+    //   }
+    // }
+    // if (previewAssets.contains(oldItem)) {
+    //   int index = previewAssets.indexOf(oldItem);
+    //   previewAssets[index] = newItem;
+    // }
+    //previewAssets
+    selectedNotifier.value = selectedCount;
+    viewerState.setState(() {});
+  }
+
   Future<bool> onChangingSelected(
     BuildContext context,
     Asset asset,
@@ -386,9 +410,13 @@ class DefaultAssetPickerViewerBuilderDelegate
     super.shouldReversePreview,
     super.selectPredicate,
     this.deleteVideoAction,
+    this.editRoute,
   });
 
   void Function()? deleteVideoAction;
+
+  //type 0 照片 1视频 lijingbiao
+  final Route<dynamic> Function(File file, int type)? editRoute;
 
   /// Thumb size for the preview of images in the viewer.
   /// 预览时图片的缩略图大小
@@ -451,6 +479,7 @@ class DefaultAssetPickerViewerBuilderDelegate
           AssetPickerViewerProvider<AssetEntity>? p,
           Widget? w,
         ) {
+          print("😃😃😃😃😃😃😃😃😃：$p");
           final bool isSelected =
               (p?.currentlySelectedAssets ?? selectedAssets)?.contains(asset) ??
                   false;
@@ -548,6 +577,7 @@ class DefaultAssetPickerViewerBuilderDelegate
     );
   }
 
+  //selectedNotifier
   @override
   Widget bottomDetailBuilder(BuildContext context) {
     final Color backgroundColor = themeData.primaryColor.withOpacity(.9);
@@ -572,19 +602,22 @@ class DefaultAssetPickerViewerBuilderDelegate
             if (provider != null)
               ValueListenableBuilder<int>(
                 valueListenable: selectedNotifier,
-                builder: (_, int count, __) => Container(
-                  width: count > 0 ? double.maxFinite : 0,
-                  height: bottomPreviewHeight,
-                  color: backgroundColor,
-                  child: ListView.builder(
-                    controller: previewingListController,
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                    physics: const ClampingScrollPhysics(),
-                    itemCount: count,
-                    itemBuilder: bottomDetailItemBuilder,
-                  ),
-                ),
+                builder: (_, int count, __) {
+                  print("😄😄😄😄😄😄😄😄😄😄😄😄😄$count");
+                  return Container(
+                    width: count > 0 ? double.maxFinite : 0,
+                    height: bottomPreviewHeight,
+                    color: backgroundColor,
+                    child: ListView.builder(
+                      controller: previewingListController,
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      physics: const ClampingScrollPhysics(),
+                      itemCount: count,
+                      itemBuilder: bottomDetailItemBuilder,
+                    ),
+                  );
+                },
               ),
             Container(
               height: bottomBarHeight + context.bottomPadding,
@@ -597,6 +630,7 @@ class DefaultAssetPickerViewerBuilderDelegate
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
+                  _buildEditButton(context), //by lijingbiao iOS编辑按钮
                   const Spacer(),
                   if (isAppleOS && (provider != null || isWeChatMoment))
                     confirmButton(context)
@@ -611,6 +645,7 @@ class DefaultAssetPickerViewerBuilderDelegate
     );
   }
 
+  //从 selectedAssets 获取的小图
   @override
   Widget bottomDetailItemBuilder(BuildContext context, int index) {
     const double padding = 8.0;
@@ -801,6 +836,7 @@ class DefaultAssetPickerViewerBuilderDelegate
     );
   }
 
+  //自定义删除视频 lijingbiao
   Widget _buildDeleteButton(BuildContext context) {
     if (deleteVideoAction == null) {
       return Spacer();
@@ -849,6 +885,7 @@ class DefaultAssetPickerViewerBuilderDelegate
     );
   }
 
+  // ' (${provider.currentlySelectedAssets.length}''/' '${selectorProvider!.maxAssets})';
   /// It'll pop with [AssetPickerProvider.selectedAssets] when there are
   /// any assets were chosen. Then, the assets picker will pop too.
   /// 当有资源已选时，点击按钮将把已选资源通过路由返回。
@@ -935,6 +972,37 @@ class DefaultAssetPickerViewerBuilderDelegate
             ),
           );
         },
+      ),
+    );
+  }
+
+  //by lijingbiao
+  Widget _buildEditButton(BuildContext context) {
+    if (editRoute == null) {
+      return SizedBox.shrink();
+    }
+    Future<void> editAction() async {
+      // ignore: prefer_final_locals
+      File? file = await currentAsset.file;
+      if (editRoute != null && file != null) {
+        AssetEntity? newEntity =
+            await Navigator.of(context, rootNavigator: true).push<AssetEntity?>(
+          editRoute?.call(file, 0) as Route<AssetEntity?>,
+        );
+        if (newEntity != null) {
+          // newEntity = newEntity.copyWith(
+          //     id: currentAsset.id, isFavorite: currentAsset.isFavorite);
+          replaceAsset(currentAsset, newEntity);
+        }
+      }
+    }
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: editAction,
+      child: const Text(
+        '编辑',
+        style: TextStyle(color: Colors.white, fontSize: 15),
       ),
     );
   }
@@ -1034,6 +1102,7 @@ class DefaultAssetPickerViewerBuilderDelegate
     );
   }
 
+  //预览数组 previewAssets
   Widget _pageViewBuilder(BuildContext context) {
     return Semantics(
       sortKey: ordinalSortKey(1),

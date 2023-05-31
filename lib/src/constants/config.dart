@@ -2,6 +2,8 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -36,6 +38,7 @@ class AssetPickerConfig {
     this.shouldRevertGrid,
     this.limitedPermissionOverlayPredicate,
     this.pathNameBuilder,
+    this.editRoute,
   })  : assert(
           pickerTheme == null || themeColor == null,
           'pickerTheme and themeColor cannot be set at the same time.',
@@ -64,6 +67,8 @@ class AssetPickerConfig {
   /// Selected assets.
   /// 已选中的资源
   final List<AssetEntity>? selectedAssets;
+  //是否可以编辑照片
+  final Route<dynamic> Function(File file, int type)? editRoute;
 
   /// Maximum count for asset selection.
   /// 资源选择的最大数量

@@ -102,6 +102,7 @@ class AssetPickerDelegate {
         textDelegate: pickerConfig.textDelegate,
         themeColor: pickerConfig.themeColor,
         locale: Localizations.maybeLocaleOf(context),
+        editRoute: pickerConfig.editRoute,
       ),
     );
     final List<AssetEntity>? result = await Navigator.of(

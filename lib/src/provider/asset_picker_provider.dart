@@ -225,6 +225,28 @@ abstract class AssetPickerProvider<Asset, Path> extends ChangeNotifier {
     set.remove(item);
     selectedAssets = set;
   }
+
+  //by lijingbiao 裁剪过的替换
+  void replaceAsset(Asset oldItem, Asset newItem) {
+    if (currentAssets.contains(oldItem)) {
+      int index = currentAssets.indexOf(oldItem);
+      currentAssets[index] = newItem;
+    }
+
+    if (selectedAssets.contains(oldItem)) {
+      int index = selectedAssets.indexOf(oldItem);
+      selectedAssets[index] = newItem;
+      notifyListeners();
+    } else {
+      if (selectedAssets.length == maxAssets) {
+        return;
+      } else {
+        final List<Asset> newList = selectedAssets.toList()..add(newItem);
+        selectedAssets = newList;
+        notifyListeners();
+      }
+    }
+  }
 }
 
 class DefaultAssetPickerProvider
