@@ -413,7 +413,7 @@ class DefaultAssetPickerViewerBuilderDelegate
     this.editRoute,
   });
 
-  void Function()? deleteVideoAction;
+  void Function(BuildContext)? deleteVideoAction;
 
   //type 0 照片 1视频 lijingbiao
   final Route<dynamic> Function(File file, int type)? editRoute;
@@ -841,26 +841,6 @@ class DefaultAssetPickerViewerBuilderDelegate
     if (deleteVideoAction == null) {
       return Spacer();
     }
-
-    Future<int?> _deleteAction() {
-      return showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
-          ),
-        ),
-        builder: (context) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 0),
-            child: DeleteVideoSheet(),
-          );
-        },
-      );
-    }
-
     return Expanded(
       child: Align(
         alignment: AlignmentDirectional.centerEnd,
@@ -872,13 +852,7 @@ class DefaultAssetPickerViewerBuilderDelegate
                 context,
               ).deleteButtonTooltip,
               onPressed: () async {
-                int? isDelete = await _deleteAction();
-                if (isDelete != null && isDelete == 1) {
-                  Navigator.of(context).pop();
-                  deleteVideoAction?.call();
-                }
-                // Navigator.of(context).pop();
-                // selectedAssets?.removeAt(currentIndex);
+                deleteVideoAction?.call(context);
               }),
         ),
       ),
@@ -1000,9 +974,9 @@ class DefaultAssetPickerViewerBuilderDelegate
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: editAction,
-      child: const Text(
-        '编辑',
-        style: TextStyle(color: Colors.white, fontSize: 15),
+      child: Text(
+        textDelegate.edit,
+        style: const TextStyle(color: Colors.white, fontSize: 15),
       ),
     );
   }
@@ -1154,74 +1128,5 @@ class DefaultAssetPickerViewerBuilderDelegate
         ),
       ),
     );
-  }
-}
-
-class DeleteVideoSheet extends StatelessWidget {
-  const DeleteVideoSheet({Key? key}) : super(key: key);
-
-  /// sheet:
-  Widget _buildSheet(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 拍摄:
-          _buildButton(
-            Text(
-              "要删除此视频吗?",
-              style: TextStyle(color: Colors.black54, fontSize: 12),
-            ),
-            height: 60,
-            onTap: null,
-          ),
-          _buildDivider(),
-          // 相册:
-          _buildButton(
-            Text(
-              "删除",
-              style: TextStyle(color: Colors.red[700], fontSize: 15),
-            ),
-            onTap: () {
-              Navigator.pop(context, 1);
-            },
-          ),
-          _buildDivider(height: 6),
-          // 取消:
-          _buildButton(
-            Text(
-              "取消",
-              style: TextStyle(color: Colors.black, fontSize: 15),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  InkWell _buildButton(Widget? child, {Function()? onTap, double height = 50}) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        alignment: Alignment.center,
-        height: height,
-        child: child,
-      ),
-    );
-  }
-
-  Widget _buildDivider({double? height}) {
-    return Container(
-      height: height ?? 1,
-      color: Colors.grey[100],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildSheet(context);
   }
 }

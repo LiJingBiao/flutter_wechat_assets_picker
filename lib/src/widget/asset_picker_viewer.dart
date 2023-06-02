@@ -42,7 +42,7 @@ class AssetPickerViewer<Asset, Path> extends StatefulWidget {
     int? maxAssets,
     bool shouldReversePreview = false,
     AssetSelectPredicate<AssetEntity>? selectPredicate,
-    void Function()? deleteVideoAction,
+    void Function(BuildContext)? deleteVideoAction,
     Route<dynamic> Function(File file, int type)? editRoute,
   }) async {
     await AssetPicker.permissionCheck();
