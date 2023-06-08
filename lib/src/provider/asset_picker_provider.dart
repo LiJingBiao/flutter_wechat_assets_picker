@@ -367,6 +367,10 @@ class DefaultAssetPickerProvider
     if (_paths.isNotEmpty) {
       _currentPath ??= _paths.first;
     }
+
+    print('相册所有路径${_paths.map(
+          (e) => e.path.name,
+        ).toList()}');
   }
 
   Completer<void>? _getAssetsFromPathCompleter;
