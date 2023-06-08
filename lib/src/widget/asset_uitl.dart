@@ -6,19 +6,15 @@ import 'package:flutter/material.dart';
 class AssetUtil {
   static String getAlumName({Locale? locale, String? name}) {
     if (name == null) {
-      return "";
+      return '';
     }
     if (Platform.isIOS) {
       return name;
     }
     final String languageCode = locale?.languageCode.toLowerCase() ?? 'en';
     if (languageCode == 'zh') {
-      final String? albumName = albumLanguageMap['zh']?[name];
-      if (albumName != null) {
-        return albumName;
-      } else {
-        return name;
-      }
+      final String albumName = albumLanguageMap['zh']?[name] ?? name;
+      return albumName;
     } else {
       return name;
     }
@@ -41,7 +37,7 @@ class AssetUtil {
       'Selfies': '自拍',
       'Slo-mo': '慢动作',
       //安卓
-      'Recent': '最近',
+      'Recent': '最近项目',
       'Camera': '相机',
       'Movies': 'Movies',
       'Pictures': 'Pictures',
