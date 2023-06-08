@@ -13,6 +13,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:wechat_assets_picker/src/widget/asset_uitl.dart';
 
 import '../constants/constants.dart';
 import '../constants/enums.dart';
@@ -51,7 +52,7 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     this.pathNameBuilder,
     Color? themeColor,
     AssetPickerTextDelegate? textDelegate,
-    Locale? locale,
+    this.locale,
   })  : assert(gridCount > 0, 'gridCount must be greater than 0.'),
         assert(
           pickerTheme == null || themeColor == null,
@@ -63,6 +64,9 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     Singleton.textDelegate =
         textDelegate ?? assetPickerTextDelegateFromLocale(locale);
   }
+
+  /// by lijingbiao 当前语言
+  final Locale? locale;
 
   /// The [PermissionState] when the picker is called.
   /// 当选择器被拉起时的权限状态
@@ -1767,10 +1771,18 @@ class DefaultAssetPickerBuilderDelegate
                       context,
                       isPermissionLimited && path.isAll
                           ? textDelegate.accessiblePathName
-                          : pathNameBuilder?.call(path) ?? path.name,
+                          : pathNameBuilder?.call(path) ??
+                              AssetUtil.getAlumName(
+                                locale: locale,
+                                name: path.name,
+                              ),
                       isPermissionLimited && path.isAll
                           ? semanticsTextDelegate.accessiblePathName
-                          : pathNameBuilder?.call(path) ?? path.name,
+                          : pathNameBuilder?.call(path) ??
+                              AssetUtil.getAlumName(
+                                locale: locale,
+                                name: path.name,
+                              ),
                     ),
                   w!,
                 ],
@@ -1828,8 +1840,11 @@ class DefaultAssetPickerBuilderDelegate
       return ColoredBox(color: theme.colorScheme.primary.withOpacity(0.12));
     }
 
-    final String pathName =
-        pathNameBuilder?.call(pathEntity) ?? pathEntity.name;
+    final String pathName = pathNameBuilder?.call(pathEntity) ??
+        AssetUtil.getAlumName(
+          locale: locale,
+          name: pathEntity.name,
+        );
     final String name = isPermissionLimited && pathEntity.isAll
         ? textDelegate.accessiblePathName
         : pathName;
@@ -1927,14 +1942,23 @@ class DefaultAssetPickerBuilderDelegate
       final DefaultAssetPickerProvider p =
           context.read<DefaultAssetPickerProvider>();
       final List<AssetEntity> selectedAssets = p.selectedAssets;
-      final List<AssetEntity> selected;
+      List<AssetEntity> selected;
       if (isWeChatMoment) {
         selected = selectedAssets
             .where((AssetEntity e) => e.type == AssetType.image)
             .toList();
+        if (selected.isEmpty) {
+          selected = selectedAssets
+              .where((AssetEntity e) => e.type == AssetType.video)
+              .toList();
+        }
       } else {
         selected = selectedAssets;
       }
+      if (selected.isEmpty) {
+        return null;
+      }
+      bool isImageType = selected.first.type == AssetType.image;
       final List<AssetEntity>? result = await AssetPickerViewer.pushToViewer(
         context,
         previewAssets: selected,
@@ -1944,7 +1968,7 @@ class DefaultAssetPickerBuilderDelegate
         selectorProvider: provider,
         themeData: theme,
         maxAssets: p.maxAssets,
-        editRoute: editRoute,
+        editRoute: isImageType ? editRoute : null,
       );
       if (result != null) {
         Navigator.of(context).maybePop(result);
