@@ -758,6 +758,10 @@ class DefaultAssetPickerBuilderDelegate
   @override
   bool get isSingleAssetMode => provider.maxAssets == 1;
 
+  /// 当前正在预览或已选的资源是否有视频
+  bool get hasVideo =>
+      provider.selectedAssets.any((AssetEntity e) => e.type == AssetType.video);
+
   /// The listener to track the scroll position of the [gridScrollController]
   /// if [keepScrollOffset] is true.
   /// 当 [keepScrollOffset] 为 true 时，跟踪 [gridScrollController] 位置的监听。
@@ -1519,7 +1523,7 @@ class DefaultAssetPickerBuilderDelegate
               : null,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           child: ScaleText(
-            p.isSelectedNotEmpty && !isSingleAssetMode
+            p.isSelectedNotEmpty && !isSingleAssetMode && !hasVideo
                 ? '${textDelegate.confirm}'
                     ' (${p.selectedAssets.length}/${p.maxAssets})'
                 : textDelegate.confirm,
@@ -1530,10 +1534,11 @@ class DefaultAssetPickerBuilderDelegate
               fontSize: 17,
               fontWeight: FontWeight.normal,
             ),
-            semanticsLabel: p.isSelectedNotEmpty && !isSingleAssetMode
-                ? '${semanticsTextDelegate.confirm}'
-                    ' (${p.selectedAssets.length}/${p.maxAssets})'
-                : semanticsTextDelegate.confirm,
+            semanticsLabel:
+                p.isSelectedNotEmpty && !isSingleAssetMode && !hasVideo
+                    ? '${semanticsTextDelegate.confirm}'
+                        ' (${p.selectedAssets.length}/${p.maxAssets})'
+                    : semanticsTextDelegate.confirm,
           ),
         );
       },
