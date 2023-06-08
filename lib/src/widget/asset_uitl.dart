@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -5,6 +7,9 @@ class AssetUtil {
   static String getAlumName({Locale? locale, String? name}) {
     if (name == null) {
       return "";
+    }
+    if (Platform.isIOS) {
+      return name;
     }
     final String languageCode = locale?.languageCode.toLowerCase() ?? 'en';
     if (languageCode == 'zh') {

@@ -13,6 +13,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:wechat_assets_picker/src/widget/asset_uitl.dart';
 
 import '../constants/constants.dart';
 import '../constants/enums.dart';
@@ -151,7 +152,8 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
 
   /// Whether the current platform is Apple OS.
   /// 当前平台是否苹果系列系统 (iOS & MacOS)
-  bool get isAppleOS => Platform.isIOS || Platform.isMacOS;
+  // bool get isAppleOS => Platform.isIOS || Platform.isMacOS;
+  bool get isAppleOS => true;
 
   /// Whether the picker is under the single asset mode.
   /// 选择器是否为单选模式
@@ -1770,10 +1772,18 @@ class DefaultAssetPickerBuilderDelegate
                       context,
                       isPermissionLimited && path.isAll
                           ? textDelegate.accessiblePathName
-                          : pathNameBuilder?.call(path) ?? path.name,
+                          : pathNameBuilder?.call(path) ??
+                              AssetUtil.getAlumName(
+                                locale: locale,
+                                name: path.name,
+                              ),
                       isPermissionLimited && path.isAll
                           ? semanticsTextDelegate.accessiblePathName
-                          : pathNameBuilder?.call(path) ?? path.name,
+                          : pathNameBuilder?.call(path) ??
+                              AssetUtil.getAlumName(
+                                locale: locale,
+                                name: path.name,
+                              ),
                     ),
                   w!,
                 ],
@@ -1831,8 +1841,11 @@ class DefaultAssetPickerBuilderDelegate
       return ColoredBox(color: theme.colorScheme.primary.withOpacity(0.12));
     }
 
-    final String pathName =
-        pathNameBuilder?.call(pathEntity) ?? pathEntity.name;
+    final String pathName = pathNameBuilder?.call(pathEntity) ??
+        AssetUtil.getAlumName(
+          locale: locale,
+          name: pathEntity.name,
+        );
     final String name = isPermissionLimited && pathEntity.isAll
         ? textDelegate.accessiblePathName
         : pathName;
