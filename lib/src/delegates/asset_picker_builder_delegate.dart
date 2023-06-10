@@ -13,7 +13,6 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
-import 'package:wechat_assets_picker/src/widget/asset_uitl.dart';
 
 import '../constants/constants.dart';
 import '../constants/enums.dart';
@@ -1777,18 +1776,10 @@ class DefaultAssetPickerBuilderDelegate
                       context,
                       isPermissionLimited && path.isAll
                           ? textDelegate.accessiblePathName
-                          : pathNameBuilder?.call(path) ??
-                              AssetUtil.getAlumName(
-                                locale: locale,
-                                name: path.name,
-                              ),
+                          : pathNameBuilder?.call(path) ?? path.name,
                       isPermissionLimited && path.isAll
                           ? semanticsTextDelegate.accessiblePathName
-                          : pathNameBuilder?.call(path) ??
-                              AssetUtil.getAlumName(
-                                locale: locale,
-                                name: path.name,
-                              ),
+                          : pathNameBuilder?.call(path) ?? path.name,
                     ),
                   w!,
                 ],
@@ -1846,11 +1837,8 @@ class DefaultAssetPickerBuilderDelegate
       return ColoredBox(color: theme.colorScheme.primary.withOpacity(0.12));
     }
 
-    final String pathName = pathNameBuilder?.call(pathEntity) ??
-        AssetUtil.getAlumName(
-          locale: locale,
-          name: pathEntity.name,
-        );
+    final String pathName =
+        pathNameBuilder?.call(pathEntity) ?? pathEntity.name;
     final String name = isPermissionLimited && pathEntity.isAll
         ? textDelegate.accessiblePathName
         : pathName;
