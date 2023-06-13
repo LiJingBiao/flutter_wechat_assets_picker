@@ -866,6 +866,12 @@ class DefaultAssetPickerViewerBuilderDelegate
   /// 资源选择器将识别并一同返回。
   @override
   Widget confirmButton(BuildContext context) {
+    if (previewAssets.length == 1 &&
+        // ignore: unrelated_type_equality_checks
+        previewAssets.first.type == AssetType.video) {
+      return const SizedBox.shrink();
+    }
+
     return CNP<AssetPickerViewerProvider<AssetEntity>?>.value(
       value: provider,
       child: Consumer<AssetPickerViewerProvider<AssetEntity>?>(
