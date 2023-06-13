@@ -1506,6 +1506,8 @@ class DefaultAssetPickerBuilderDelegate
   /// 当有资源已选时，点击按钮将把已选资源通过路由返回。
   @override
   Widget confirmButton(BuildContext context) {
+    double width = MediaQuery.of(context).size.width * 0.5;
+
     return Consumer<DefaultAssetPickerProvider>(
       builder: (_, DefaultAssetPickerProvider p, __) {
         return MaterialButton(
@@ -1521,23 +1523,28 @@ class DefaultAssetPickerBuilderDelegate
               ? () => Navigator.of(context).maybePop(p.selectedAssets)
               : null,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          child: ScaleText(
-            p.isSelectedNotEmpty && !isSingleAssetMode && !hasVideo
-                ? '${textDelegate.confirm}'
-                    ' (${p.selectedAssets.length}/${p.maxAssets})'
-                : textDelegate.confirm,
-            style: TextStyle(
-              color: p.isSelectedNotEmpty
-                  ? theme.textTheme.bodyLarge?.color
-                  : theme.textTheme.bodySmall?.color,
-              fontSize: 17,
-              fontWeight: FontWeight.normal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: width),
+            child: ScaleText(
+              p.isSelectedNotEmpty && !isSingleAssetMode && !hasVideo
+                  ? '${textDelegate.confirm}'
+                      ' (${p.selectedAssets.length}/${p.maxAssets})'
+                  : textDelegate.confirm,
+              style: TextStyle(
+                color: p.isSelectedNotEmpty
+                    ? theme.textTheme.bodyLarge?.color
+                    : theme.textTheme.bodySmall?.color,
+                fontSize: 17,
+                fontWeight: FontWeight.normal,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              semanticsLabel:
+                  p.isSelectedNotEmpty && !isSingleAssetMode && !hasVideo
+                      ? '${semanticsTextDelegate.confirm}'
+                          ' (${p.selectedAssets.length}/${p.maxAssets})'
+                      : semanticsTextDelegate.confirm,
             ),
-            semanticsLabel:
-                p.isSelectedNotEmpty && !isSingleAssetMode && !hasVideo
-                    ? '${semanticsTextDelegate.confirm}'
-                        ' (${p.selectedAssets.length}/${p.maxAssets})'
-                    : semanticsTextDelegate.confirm,
           ),
         );
       },
@@ -1969,6 +1976,8 @@ class DefaultAssetPickerBuilderDelegate
       }
     }
 
+    double maxWidth = MediaQuery.of(context).size.width * 0.35;
+
     return Consumer<DefaultAssetPickerProvider>(
       builder: (_, DefaultAssetPickerProvider p, Widget? child) {
         return ValueListenableBuilder<bool>(
@@ -1990,18 +1999,23 @@ class DefaultAssetPickerBuilderDelegate
                 p.selectedDescriptions,
             builder: (BuildContext c, __, ___) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: ScaleText(
-                '${textDelegate.preview}'
-                '${p.isSelectedNotEmpty ? ' (${p.selectedAssets.length})' : ''}',
-                style: TextStyle(
-                  color: p.isSelectedNotEmpty
-                      ? null
-                      : c.themeData.textTheme.bodySmall?.color,
-                  fontSize: 17,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                child: ScaleText(
+                  '${textDelegate.preview}'
+                  '${p.isSelectedNotEmpty ? ' (${p.selectedAssets.length})' : ''}',
+                  style: TextStyle(
+                    color: p.isSelectedNotEmpty
+                        ? null
+                        : c.themeData.textTheme.bodySmall?.color,
+                    fontSize: 17,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  maxScaleFactor: 1.2,
+                  semanticsLabel: '${semanticsTextDelegate.preview}'
+                      '${p.isSelectedNotEmpty ? ' (${p.selectedAssets.length})' : ''}',
                 ),
-                maxScaleFactor: 1.2,
-                semanticsLabel: '${semanticsTextDelegate.preview}'
-                    '${p.isSelectedNotEmpty ? ' (${p.selectedAssets.length})' : ''}',
               ),
             ),
           ),
