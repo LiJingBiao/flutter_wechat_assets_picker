@@ -69,7 +69,7 @@ class AssetPickerConfig {
   /// 已选中的资源
   final List<AssetEntity>? selectedAssets;
   //是否可以编辑照片
-  final Route<dynamic> Function(File file, int type)? editRoute;
+  final Route<dynamic> Function(dynamic file, int type)? editRoute;
 
   /// Maximum count for asset selection.
   /// 资源选择的最大数量

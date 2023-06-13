@@ -43,7 +43,8 @@ class AssetPickerViewer<Asset, Path> extends StatefulWidget {
     bool shouldReversePreview = false,
     AssetSelectPredicate<AssetEntity>? selectPredicate,
     void Function(BuildContext)? deleteVideoAction,
-    Route<dynamic> Function(File file, int type)? editRoute,
+    Route<dynamic> Function(dynamic file, int type)? editRoute,
+    bool showConfirmButton = true,
   }) async {
     await AssetPicker.permissionCheck();
     final Widget viewer = AssetPickerViewer<AssetEntity, AssetPathEntity>(
@@ -68,6 +69,7 @@ class AssetPickerViewer<Asset, Path> extends StatefulWidget {
         selectPredicate: selectPredicate,
         deleteVideoAction: deleteVideoAction,
         editRoute: editRoute,
+        showConfrimButton: showConfirmButton,
       ),
     );
     final PageRouteBuilder<List<AssetEntity>> pageRoute =

@@ -692,7 +692,7 @@ class DefaultAssetPickerBuilderDelegate
   final DefaultAssetPickerProvider provider;
 
   //是否可以编辑照片
-  final Route<dynamic> Function(File file, int type)? editRoute;
+  final Route<dynamic> Function(dynamic file, int type)? editRoute;
 
   /// Thumbnail size in the grid.
   /// 预览时网络的缩略图大小
@@ -767,6 +767,24 @@ class DefaultAssetPickerBuilderDelegate
   void keepScrollOffsetListener() {
     if (gridScrollController.hasClients) {
       Singleton.scrollPosition = gridScrollController.position;
+    }
+  }
+
+  Future<void> _confirmButtonAction(
+      BuildContext context, List<AssetEntity> selectedAssets) async {
+    if (selectedAssets.length == 1 &&
+        selectedAssets.first.type == AssetType.video &&
+        editRoute != null) {
+      // ignore: prefer_final_locals
+      AssetEntity? newEntity =
+          await Navigator.of(context, rootNavigator: true).push<AssetEntity?>(
+        editRoute?.call(selectedAssets.first, 1) as Route<AssetEntity?>,
+      );
+      if (newEntity != null) {
+        Navigator.of(context).maybePop([newEntity]);
+      }
+    } else {
+      Navigator.of(context).maybePop(selectedAssets);
     }
   }
 
@@ -890,8 +908,20 @@ class DefaultAssetPickerBuilderDelegate
     final List<AssetEntity> current;
     final List<AssetEntity>? selected;
     final int effectiveIndex;
+    bool showConfirmButton = true;
     if (isWeChatMoment) {
       if (currentAsset.type == AssetType.video) {
+        if (currentAsset.duration > 10 * 60) {
+          showConfirmButton = false;
+        }
+        // 获取文件路径
+        File? file = await currentAsset.file;
+        int size = await file?.length() ?? 0;
+        print(size);
+        if (size > 1000 * 1000 * 200) {
+          showConfirmButton = false;
+        }
+
         current = <AssetEntity>[currentAsset];
         selected = null;
         effectiveIndex = 0;
@@ -919,6 +949,7 @@ class DefaultAssetPickerBuilderDelegate
       specialPickerType: specialPickerType,
       maxAssets: provider.maxAssets,
       shouldReversePreview: isAppleOS,
+      showConfirmButton: showConfirmButton,
     );
     if (result != null) {
       Navigator.of(context).maybePop(result);
@@ -1520,7 +1551,7 @@ class DefaultAssetPickerBuilderDelegate
             borderRadius: BorderRadius.circular(3),
           ),
           onPressed: p.isSelectedNotEmpty
-              ? () => Navigator.of(context).maybePop(p.selectedAssets)
+              ? () => _confirmButtonAction(context, p.selectedAssets)
               : null,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           child: ConstrainedBox(

@@ -411,12 +411,15 @@ class DefaultAssetPickerViewerBuilderDelegate
     super.selectPredicate,
     this.deleteVideoAction,
     this.editRoute,
+    this.showConfrimButton = true,
   });
+
+  bool showConfrimButton;
 
   void Function(BuildContext)? deleteVideoAction;
 
   //type 0 照片 1视频 lijingbiao
-  final Route<dynamic> Function(File file, int type)? editRoute;
+  final Route<dynamic> Function(dynamic file, int type)? editRoute;
 
   /// Thumb size for the preview of images in the viewer.
   /// 预览时图片的缩略图大小
@@ -866,9 +869,7 @@ class DefaultAssetPickerViewerBuilderDelegate
   /// 资源选择器将识别并一同返回。
   @override
   Widget confirmButton(BuildContext context) {
-    if (previewAssets.length == 1 &&
-        // ignore: unrelated_type_equality_checks
-        previewAssets.first.type == AssetType.video) {
+    if (!showConfrimButton) {
       return const SizedBox.shrink();
     }
 
