@@ -411,7 +411,10 @@ class DefaultAssetPickerViewerBuilderDelegate
     super.selectPredicate,
     this.deleteVideoAction,
     this.editRoute,
+    this.showConfrimButton = true,
   });
+
+  bool showConfrimButton;
 
   void Function(BuildContext)? deleteVideoAction;
 
@@ -866,6 +869,10 @@ class DefaultAssetPickerViewerBuilderDelegate
   /// 资源选择器将识别并一同返回。
   @override
   Widget confirmButton(BuildContext context) {
+    if (!showConfrimButton) {
+      return const SizedBox.shrink();
+    }
+
     return CNP<AssetPickerViewerProvider<AssetEntity>?>.value(
       value: provider,
       child: Consumer<AssetPickerViewerProvider<AssetEntity>?>(
@@ -885,6 +892,7 @@ class DefaultAssetPickerViewerBuilderDelegate
                   editRoute?.call(currentAsset, 1) as Route<AssetEntity?>,
                 );
                 if (newEntity != null) {
+                  // ignore: always_specify_types
                   Navigator.of(context).maybePop([newEntity]);
                 }
               } else {
