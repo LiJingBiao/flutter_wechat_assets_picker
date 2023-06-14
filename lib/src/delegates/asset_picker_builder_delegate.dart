@@ -2019,6 +2019,7 @@ class DefaultAssetPickerBuilderDelegate
         themeData: theme,
         maxAssets: p.maxAssets,
         editRoute: editRoute,
+        specialPickerType: specialPickerType,
       );
       if (result != null) {
         Navigator.of(context).maybePop(result);
