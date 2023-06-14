@@ -908,24 +908,25 @@ class DefaultAssetPickerBuilderDelegate
     final List<AssetEntity> current;
     final List<AssetEntity>? selected;
     final int effectiveIndex;
-    bool showConfirmButton = true;
+    bool validVideo = true;
     if (isWeChatMoment) {
       if (currentAsset.type == AssetType.video) {
         if (currentAsset.duration > 10 * 60) {
-          showConfirmButton = false;
+          validVideo = false;
         }
         // 获取文件路径
         File? file = await currentAsset.file;
         int size = await file?.length() ?? 0;
         print(size);
         if (size > 1000 * 1000 * 200) {
-          showConfirmButton = false;
+          validVideo = false;
         }
 
         current = <AssetEntity>[currentAsset];
         selected = null;
         effectiveIndex = 0;
       } else {
+        validVideo = false;
         current = provider.currentAssets
             .where((AssetEntity e) => e.type == AssetType.image)
             .toList();
@@ -933,26 +934,38 @@ class DefaultAssetPickerBuilderDelegate
         effectiveIndex = current.indexOf(currentAsset);
       }
     } else {
+      validVideo = false;
       current = provider.currentAssets;
       selected = provider.selectedAssets;
       effectiveIndex = index;
     }
-    final List<AssetEntity>? result = await AssetPickerViewer.pushToViewer(
-      context,
-      currentIndex: effectiveIndex,
-      previewAssets: current,
-      themeData: theme,
-      previewThumbnailSize: previewThumbnailSize,
-      selectPredicate: selectPredicate,
-      selectedAssets: selected,
-      selectorProvider: provider,
-      specialPickerType: specialPickerType,
-      maxAssets: provider.maxAssets,
-      shouldReversePreview: isAppleOS,
-      showConfirmButton: showConfirmButton,
-    );
-    if (result != null) {
-      Navigator.of(context).maybePop(result);
+
+    if (validVideo && editRoute != null) {
+      // ignore: prefer_final_locals
+      AssetEntity? newEntity =
+          await Navigator.of(context, rootNavigator: true).push<AssetEntity?>(
+        editRoute?.call(currentAsset, 1) as Route<AssetEntity?>,
+      );
+      if (newEntity != null) {
+        Navigator.of(context).maybePop([newEntity]);
+      }
+    } else {
+      final List<AssetEntity>? result = await AssetPickerViewer.pushToViewer(
+        context,
+        currentIndex: effectiveIndex,
+        previewAssets: current,
+        themeData: theme,
+        previewThumbnailSize: previewThumbnailSize,
+        selectPredicate: selectPredicate,
+        selectedAssets: selected,
+        selectorProvider: provider,
+        specialPickerType: specialPickerType,
+        maxAssets: provider.maxAssets,
+        shouldReversePreview: isAppleOS,
+      );
+      if (result != null) {
+        Navigator.of(context).maybePop(result);
+      }
     }
   }
 
@@ -2000,7 +2013,7 @@ class DefaultAssetPickerBuilderDelegate
         selectorProvider: provider,
         themeData: theme,
         maxAssets: p.maxAssets,
-        editRoute: isImageType ? editRoute : null,
+        editRoute: editRoute,
       );
       if (result != null) {
         Navigator.of(context).maybePop(result);

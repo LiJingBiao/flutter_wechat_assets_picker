@@ -411,10 +411,7 @@ class DefaultAssetPickerViewerBuilderDelegate
     super.selectPredicate,
     this.deleteVideoAction,
     this.editRoute,
-    this.showConfrimButton = true,
   });
-
-  bool showConfrimButton;
 
   void Function(BuildContext)? deleteVideoAction;
 
@@ -869,10 +866,6 @@ class DefaultAssetPickerViewerBuilderDelegate
   /// 资源选择器将识别并一同返回。
   @override
   Widget confirmButton(BuildContext context) {
-    if (!showConfrimButton) {
-      return const SizedBox.shrink();
-    }
-
     return CNP<AssetPickerViewerProvider<AssetEntity>?>.value(
       value: provider,
       child: Consumer<AssetPickerViewerProvider<AssetEntity>?>(
@@ -883,8 +876,21 @@ class DefaultAssetPickerViewerBuilderDelegate
             'when the special type is not WeChat moment.',
           );
           Future<void> onPressed() async {
-            if (isWeChatMoment && hasVideo) {
-              Navigator.of(context).pop(<AssetEntity>[currentAsset]);
+            if (hasVideo) {
+              if (editRoute != null) {
+                // ignore: prefer_final_locals
+                AssetEntity? newEntity =
+                    await Navigator.of(context, rootNavigator: true)
+                        .push<AssetEntity?>(
+                  editRoute?.call(currentAsset, 1) as Route<AssetEntity?>,
+                );
+                if (newEntity != null) {
+                  Navigator.of(context).maybePop([newEntity]);
+                }
+              } else {
+                Navigator.of(context).pop(<AssetEntity>[currentAsset]);
+              }
+
               return;
             }
             if (provider!.isSelectedNotEmpty) {
@@ -959,6 +965,10 @@ class DefaultAssetPickerViewerBuilderDelegate
 
   //by lijingbiao
   Widget _buildEditButton(BuildContext context) {
+    print("isWeChatMoment:${isWeChatMoment}, hasVideo:${hasVideo}");
+    if (hasVideo) {
+      return SizedBox.shrink();
+    }
     if (editRoute == null) {
       return SizedBox.shrink();
     }
