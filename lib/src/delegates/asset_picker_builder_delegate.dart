@@ -1583,7 +1583,7 @@ class DefaultAssetPickerBuilderDelegate
                 color: p.isSelectedNotEmpty
                     ? theme.textTheme.bodyLarge?.color
                     : theme.textTheme.bodySmall?.color,
-                fontSize: 17,
+                fontSize: 15,
                 fontWeight: FontWeight.normal,
               ),
               maxLines: 1,
@@ -2026,7 +2026,7 @@ class DefaultAssetPickerBuilderDelegate
       }
     }
 
-    double maxWidth = MediaQuery.of(context).size.width * 0.35;
+    double maxWidth = MediaQuery.of(context).size.width * 0.45;
 
     return Consumer<DefaultAssetPickerProvider>(
       builder: (_, DefaultAssetPickerProvider p, Widget? child) {
@@ -2058,7 +2058,7 @@ class DefaultAssetPickerBuilderDelegate
                     color: p.isSelectedNotEmpty
                         ? null
                         : c.themeData.textTheme.bodySmall?.color,
-                    fontSize: 17,
+                    fontSize: 15,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
