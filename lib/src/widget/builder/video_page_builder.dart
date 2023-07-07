@@ -105,6 +105,13 @@ class _VideoPageBuilderState extends State<VideoPageBuilder> {
     } finally {
       if (mounted) {
         setState(() {});
+        if (Platform.isIOS) {
+          Future.delayed(Duration(milliseconds: 100)).then(
+            (value) {
+              setState(() {});
+            },
+          );
+        }
       }
     }
   }
