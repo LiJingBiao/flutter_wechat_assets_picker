@@ -129,8 +129,7 @@ abstract class AssetPickerViewerBuilderDelegate<Asset, Path> {
 
   /// Whether the viewer is under preview mode for selected assets.
   /// 当前是否处于查看已选中资源的模式
-  late final bool isSelectedPreviewing =
-      selectedAssets == previewAssets && selectedAssets?.length != 1;
+  late final bool isSelectedPreviewing = selectedAssets == previewAssets;
 
   /// Getter for the current asset.
   /// 当前资源的Getter

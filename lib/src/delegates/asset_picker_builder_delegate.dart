@@ -2011,7 +2011,7 @@ class DefaultAssetPickerBuilderDelegate
       bool isImageType = selected.first.type == AssetType.image;
       final List<AssetEntity>? result = await AssetPickerViewer.pushToViewer(
         context,
-        previewAssets: selected,
+        previewAssets: [...selected],
         previewThumbnailSize: previewThumbnailSize,
         selectPredicate: selectPredicate,
         selectedAssets: selected,
